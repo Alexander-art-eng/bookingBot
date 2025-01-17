@@ -17,7 +17,7 @@ class BookingFiltrations:
     def __init__(self, driver: WebDriver):
         self.driver = driver
 
-    def apply_star_rating(self, star_rating):
+    def apply_star_rating(self, *star_ratings):
         retries = 5  # Number of retries to handle stale elements
         try:
             for attempt in range(retries):
@@ -29,11 +29,11 @@ class BookingFiltrations:
                     star_child_elements = star_filtration_box.find_elements(By.CSS_SELECTOR, "*")
 
                     for star_element in star_child_elements:
-                        # Match the inner HTML with the desired rating
-                        if str(star_element.get_attribute("innerHTML")).strip() == f"{star_rating} stars":
+                        # Check if the star rating is in the list of desired ratings
+                        if str(star_element.get_attribute("innerHTML")).strip() in [f"{rating} stars" for rating in star_ratings]:
                             star_element.click()  # Click the desired star rating
-                            print(f"Successfully clicked {star_rating} stars filter.")
-                            return
+                            print(f"Successfully clicked {star_element.get_attribute('innerHTML').strip()} filter.")
+                    return
                 except StaleElementReferenceException:
                     print(f"Stale element reference on attempt {attempt + 1}. Retrying...")
                     time.sleep(1)  # Short delay before retrying
@@ -44,7 +44,7 @@ class BookingFiltrations:
                 except Exception as e:
                     print(f"An error occurred: {e}")
                     return
-            print(f"Failed to apply {star_rating} stars filter after {retries} retries.")
+            print(f"Failed to apply star filters after {retries} retries.")
         except Exception as e:
             print(f"Unexpected error occurred: {e}")
 
