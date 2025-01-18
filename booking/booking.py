@@ -174,7 +174,7 @@ class Booking(webdriver.Chrome):
     def apply_filtration(self):
         try:
             filtration = BookingFiltrations(driver=self)
-            filtration.apply_star_rating(3)
+            filtration.apply_star_rating(1)
         except Exception as error:
             print(f"Error applying filtration: {error}")
         except NoSuchElementException as error:
