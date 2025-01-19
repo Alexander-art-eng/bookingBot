@@ -5,6 +5,7 @@ from selenium import webdriver
 from selenium.common import WebDriverException, NoSuchElementException, TimeoutException
 # Import the Service class from selenium.webdriver.chrome.service and alias it as ChromeService
 from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium.webdriver.remote.webelement import WebElement
 # Import the WebDriverWait class from selenium.webdriver.support.wait
 from selenium.webdriver.support import expected_conditions as EC
 # Import the WebDriverWait class from selenium.webdriver.support.wait
@@ -17,6 +18,9 @@ from selenium.webdriver.common.by import By
 import booking.constants as const
 # Import the BookingFiltrations class from the booking.booking_filtration module
 from booking.booking_filtration import BookingFiltrations
+# Import the BookingReport class from the booking.booking_report module
+from booking.booking_report import BookingReport
+
 
 # Define a class named Booking that inherits from webdriver.Chrome
 class Booking(webdriver.Chrome):
@@ -26,8 +30,11 @@ class Booking(webdriver.Chrome):
         service = ChromeService(ChromeDriverManager().install())
         # Set the instance attribute teardown to the value of the teardown parameter
         self.teardown = teardown
+        # To ingnore unnecessary errors from google drive (devTools logs)
+        options = webdriver.ChromeOptions()
+        options.add_experimental_option('excludeSwitches', ['enable-logging'])
         # Call the constructor of the superclass (webdriver.Chrome) with the service parameter
-        super(Booking, self).__init__(service=service)
+        super(Booking, self).__init__(service=service, options=options)
         # Set the implicit wait time to 15 seconds to wait for elements to load
         self.implicitly_wait(15)
         # Maximize the browser window
@@ -37,10 +44,9 @@ class Booking(webdriver.Chrome):
         # Check if teardown is True and the browser session is still active
         if self.teardown and self.session_id:
             # Prompt the user with a yes/no question to close the browser
-            user_choice = input("Do you want to close the browser? (y/n): ").strip().lower()
-            # If the user chooses "yes", close the browser
-            if user_choice == "y":
-                self.quit()
+            user_choice = input("Press any key to close the browser. ").strip().lower()
+            # If the user types and key, close the browser
+            self.quit()
 
     # Define a method named land_first_page that navigates to the base URL
     def land_first_page(self):
@@ -174,8 +180,15 @@ class Booking(webdriver.Chrome):
     def apply_filtration(self):
         try:
             filtration = BookingFiltrations(driver=self)
-            filtration.apply_star_rating(1)
+            filtration.apply_star_rating(1, 3, 5)
+            time.sleep(1)
+            filtration.sort_price_lowest()
         except Exception as error:
             print(f"Error applying filtration: {error}")
         except NoSuchElementException as error:
             print(f"Element not found while applying filtration: {error}")
+
+    # Define a method to print a table of the results
+    def show_results(self):
+        results = BookingReport(driver=self)
+        results.print_results()

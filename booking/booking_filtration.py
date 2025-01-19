@@ -4,21 +4,15 @@
 import time
 
 from selenium.webdriver.remote.webdriver import WebDriver
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import TimeoutException, NoSuchElementException, StaleElementReferenceException
-from selenium.webdriver.support.wait import WebDriverWait
-
-
-# from selenium.webdriver.support.wait import WebDriverWait
-
+from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
 
 class BookingFiltrations:
     def __init__(self, driver: WebDriver):
         self.driver = driver
 
     def apply_star_rating(self, *star_ratings):
-        retries = 5  # Number of retries to handle stale elements
+        retries = 3  # Number of retries to handle stale elements
         try:
             for attempt in range(retries):
                 try:
@@ -48,4 +42,10 @@ class BookingFiltrations:
             print(f"Failed to apply star filters after {retries} retries.")
         except Exception as e:
             print(f"Unexpected error occurred: {e}")
+
+    def sort_price_lowest(self):
+        sort_button = self.driver.find_element(By.CSS_SELECTOR, "button[data-testid='sorters-dropdown-trigger']")
+        sort_button.click()
+        price_lowest_option = self.driver.find_element(By.CSS_SELECTOR, "button[aria-label='Price (lowest first)']")
+        price_lowest_option.click()
 
