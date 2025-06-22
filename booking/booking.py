@@ -5,7 +5,6 @@ from selenium import webdriver
 from selenium.common import WebDriverException, NoSuchElementException, TimeoutException
 # Import the Service class from selenium.webdriver.chrome.service and alias it as ChromeService
 from selenium.webdriver.chrome.service import Service as ChromeService
-from selenium.webdriver.remote.webelement import WebElement
 # Import the WebDriverWait class from selenium.webdriver.support.wait
 from selenium.webdriver.support import expected_conditions as EC
 # Import the WebDriverWait class from selenium.webdriver.support.wait
