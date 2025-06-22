@@ -1,4 +1,4 @@
-import time
+# import time
 # Import webdriver from selenium
 from selenium import webdriver
 # Import the exceptions from selenium.common to handle exceptions
