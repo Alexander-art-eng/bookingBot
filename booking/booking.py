@@ -1,6 +1,6 @@
 import time
 # Import webdriver from selenium
-# from selenium import webdriver
+from selenium import webdriver
 # Import the exceptions from selenium.common to handle exceptions
 from selenium.common import WebDriverException, NoSuchElementException, TimeoutException
 # Import the Service class from selenium.webdriver.chrome.service and alias it as ChromeService
@@ -61,7 +61,7 @@ class Booking(webdriver.Chrome):
         # Find the element with the id that it has
         try:
             decline_element = self.find_element(
-                By.ID, "onetrust-reject-all-handler"
+                By.XPATH, ".//button[@id='onetrust-reject-all-handler']"
             )
             decline_element.click()
         except NoSuchElementException as error:
@@ -70,10 +70,9 @@ class Booking(webdriver.Chrome):
     def change_currency(self, currency=None):
         try:
             currency_element = self.find_element(
-                By.CSS_SELECTOR, "button[data-testid='header-currency-picker-trigger']"
+                By.XPATH, ".//button[@data-testid='header-currency-picker-trigger']"
             )
             currency_element.click()
-            # currency_xpath = f"//*[@id='header_currency_picker']//div[contains(text(), '{currency}')]"
             currency_xpath = f"//button[@data-testid='selection-item']//div[contains(text(), '{currency}')]"
             selected_currency_element = WebDriverWait(self, 30).until(
                 EC.element_to_be_clickable((By.XPATH, currency_xpath))
@@ -89,7 +88,7 @@ class Booking(webdriver.Chrome):
     # Define a method to close the promo banner
     def close_promo(self):
         try:
-            promo_element_xpath = "//button[@class='a83ed08757 c21c56c305 f38b6daa18 d691166b09 ab98298258 f4552b6561']"
+            promo_element_xpath = ".//div[contains(@class, 'fd1bba3c6c a5d282bede')]//button"
             promo_element = WebDriverWait(self, 10).until(
                 EC.element_to_be_clickable((By.XPATH, promo_element_xpath))
             )
@@ -105,32 +104,33 @@ class Booking(webdriver.Chrome):
     def select_place_togo(self, place=None):
         try:
             search_element = self.find_element(
-                By.NAME, "ss"
+                By.XPATH, ".//div[contains(@class, 'be34ebee1c')]//input"
             )
             search_element.clear()
             search_element.send_keys(place)
-
-            # selected_place_xpath = f"//div[@data-testid='autocomplete-result']//div[contains(text(), '{place}')]"
-            selected_place_xpath = f"//li[@id='autocomplete-result-0']//div[contains(text(), '{place}')]"
-            selected_place_element = WebDriverWait(self, 10).until(
-                EC.element_to_be_clickable((By.XPATH, selected_place_xpath))
-            )
-            selected_place_element.click()
+            # selected_place_xpath = f"//li[@id='autocomplete-result-0']//div[contains(text(), '{place}')]"
+            # selected_place_element = WebDriverWait(self, 10).until(
+            #     EC.element_to_be_clickable((By.XPATH, selected_place_xpath))
+            # )
+            place_to_go = self.find_element(By.XPATH, f".//div[contains(@data-testid, 'autocomplete-result')]//div[contains(text(), '{place}')]")
+            place_to_go.click()
 
         except NoSuchElementException as error:
             print(f"Search element not found. Error: {error}")
+            return
         except Exception as error:
             print(f"Unexpected error while selecting the place to go to. Error: {error}")
+            return
 
     # Define a method to select the check-in and check-out dates
     def select_dates(self, check_in_date=None, check_out_date=None):
         try:
             check_in_element = self.find_element(
-                By.CSS_SELECTOR, f"td span[data-date='{check_in_date}']"
+                By.XPATH, f".//td[contains(@class, 'f6ec917956')]//span[@data-date='{check_in_date}']"
             )
             check_in_element.click()
             check_out_element = self.find_element(
-                By.CSS_SELECTOR, f"td span[data-date='{check_out_date}']"
+                By.XPATH, f".//td[contains(@class, 'f6ec917956')]//span[@data-date='{check_out_date}']"
             )
             check_out_element.click()
         except NoSuchElementException as error:
@@ -142,19 +142,18 @@ class Booking(webdriver.Chrome):
     def select_adults(self, number_of_adults=1):
         try:
             adults_element = self.find_element(
-                By.CSS_SELECTOR, "button[data-testid='occupancy-config']"
+                By.XPATH, ".//button[contains(@class, 'b3d1de1c28')]"
             )
             adults_element.click()
 
             while True:
-                decrease_adults_element = self.find_element(By.CSS_SELECTOR, "div[data-testid='occupancy-popup'] button[class$='e91c91fa93']")
+                decrease_adults_element = self.find_element(By.XPATH, ".//div[contains(@class, 'e301a14002')]//button[contains(@class, 'aaf9b6e287 c857f39cb2')]")
                 decrease_adults_element.click()
-                adults_value_element = self.find_element(By.CSS_SELECTOR, "div[data-testid='occupancy-popup'] input[id='group_adults']")
-                adult_value = adults_value_element.get_attribute("value")
-                if int(adult_value) == 1:
+                adults_value = self.find_element(By.XPATH, ".//span[contains(@class, 'e32aa465fd')]").text
+                if int(adults_value) == 1:
                     break
 
-            increase_adults_element = self.find_element(By.CSS_SELECTOR, "div[data-testid='occupancy-popup'] button[class$='f4d78af12a']")
+            increase_adults_element = self.find_element(By.XPATH, ".//button[contains(@class, 'aaf9b6e287 dc8366caa6')]")
             for _ in range(number_of_adults - 1):
                 increase_adults_element.click()
 
@@ -166,8 +165,8 @@ class Booking(webdriver.Chrome):
     # Define a method to click the search button
     def click_search(self):
         try:
-            search_button = self.find_element(
-                By.CSS_SELECTOR, "button[type='submit']"
+            search_button = WebDriverWait(self, 10).until(
+                EC.element_to_be_clickable((By.XPATH, ".//button[contains(@class, 'a9d40b8d51')]/span"))
             )
             search_button.click()
         except NoSuchElementException as error:
@@ -182,10 +181,10 @@ class Booking(webdriver.Chrome):
             filtration.apply_star_rating(1, 3, 5)
             time.sleep(1)
             filtration.sort_price_lowest()
+        except NoSuchElementException as e:
+            print(f"Element not found while applying filtration: {e}")
         except Exception as error:
             print(f"Error applying filtration: {error}")
-        except NoSuchElementException as error:
-            print(f"Element not found while applying filtration: {error}")
 
     # Define a method to print a table of the results
     def show_results(self):

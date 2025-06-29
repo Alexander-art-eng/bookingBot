@@ -11,21 +11,20 @@ class BookingReport:
         collection = []
         try:
             hotels = self.driver.find_elements(
-                By.CSS_SELECTOR, "div[data-testid='property-card']"
+                By.XPATH, ".//div[@data-testid='property-card']"
             )
             for hotel in hotels:
                 hotel_name = hotel.find_element(
-                    By.CSS_SELECTOR, "div[data-testid='title']"
+                    By.XPATH, ".//div[@data-testid='title']"
                 ).text.strip()
                 hotel_price = hotel.find_element(
-                    By.CSS_SELECTOR, "span[data-testid='price-and-discounted-price']"
+                    By.XPATH, ".//span[@data-testid='price-and-discounted-price']"
                 ).text.strip()
                 hotel_score = hotel.find_element(
-                    By.CSS_SELECTOR, "div[class$='d86cee9b25']"
-                ).text.split()[1]
-                # print(f"Hotel: {hotel_name}, Price: {hotel_price}, Score: {hotel_score}")
+                    By.XPATH, ".//div[contains(@class, 'f63b14ab7a dff2e52086')]"
+                ).text.split()
                 collection.append(
-                    [hotel_name, hotel_price, hotel_score]
+                    [hotel_name, hotel_price, hotel_score[0]]
                 )
             table = PrettyTable(
                 field_names=["Hotel Name", "Price", "Score"]
